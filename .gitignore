@@ -1,0 +1,15 @@
+﻿# Windows folder metadata (contains local file names)
+desktop.ini
+Desktop.ini
+Thumbs.db
+
+# Personal diary data / exports / backups — never commit
+*.json
+*.csv
+*.bak
+backup/
+export/
+diary/
+journal/
+.env
+.env.*
