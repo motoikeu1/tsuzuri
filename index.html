@@ -211,6 +211,23 @@ dialog::backdrop{background:var(--overlay)}
 .dlg-body p{margin:0 0 8px}
 .dlg-text{width:100%;height:40vh;padding:10px;border:1px solid var(--rule-2);border-radius:2px;background:var(--paper-2);color:var(--ink);font-size:13px;line-height:1.6;resize:vertical}
 .dlg-actions{justify-content:flex-end;margin-top:14px}
+.top-r{display:flex;align-items:center;gap:10px}
+.help-btn{appearance:none;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid var(--rule-2);border-radius:2px;background:transparent;color:var(--green-ink);font-size:13px;line-height:1.4;white-space:nowrap;cursor:pointer}
+.help-btn:hover{background:var(--paper-2)}
+.help-btn .q{display:inline-grid;place-items:center;width:15px;height:15px;border:1px solid currentColor;border-radius:50%;font-size:10.5px;font-weight:700;line-height:1}
+dialog.help{width:min(640px,calc(100vw - 32px));padding:0;display:none;flex-direction:column;overflow:hidden}
+dialog.help[open]{display:flex}
+.help-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px 12px;border-bottom:1px solid var(--rule-2)}
+.help-head .dlg-title{margin:0;font-size:22px}
+.help-body{overflow-y:auto;padding:6px 20px 8px;font-size:14.5px;line-height:1.8}
+.help-body h3{margin:22px 0 6px;padding-left:10px;border-left:2px solid var(--green);font-family:var(--pen);font-weight:600;font-size:18px;line-height:1.4}
+.help-body p{margin:0 0 8px}
+.help-body dl{margin:0 0 8px}
+.help-body dt{margin:10px 0 0;font-weight:700;font-size:14px}
+.help-body dd{margin:0 0 0 1em;color:var(--ink-2)}
+.help-body .k{display:inline-block;padding:0 7px;border:1px solid var(--rule-2);border-radius:2px;background:var(--paper-2);color:var(--ink);font-size:12.5px;font-weight:500;line-height:1.6;white-space:nowrap}
+.help-note{margin:14px 0 4px;padding:10px 14px;border-radius:2px;background:var(--paper-2);font-size:13.5px;color:var(--ink-2)}
+.help-foot{padding:12px 20px;border-top:1px solid var(--rule-2);text-align:right}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);z-index:30;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:10px 16px;border-radius:2px;background:var(--ink);color:var(--paper);font-size:13.5px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 .mirror{position:absolute;top:0;left:-10000px;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;word-wrap:break-word}
 @media (prefers-reduced-motion:no-preference){
@@ -236,11 +253,14 @@ dialog::backdrop{background:var(--overlay)}
 <header class="topbar chrome">
   <div class="topbar-in">
     <span class="brand">綴</span>
-    <nav class="tabs" aria-label="画面">
-      <button class="tab" type="button" data-view="write" aria-current="page">書く</button>
-      <button class="tab" type="button" data-view="review">ふりかえる</button>
-      <button class="tab" type="button" data-view="settings">設定</button>
-    </nav>
+    <div class="top-r">
+      <nav class="tabs" aria-label="画面">
+        <button class="tab" type="button" data-view="write" aria-current="page">書く</button>
+        <button class="tab" type="button" data-view="review">ふりかえる</button>
+        <button class="tab" type="button" data-view="settings">設定</button>
+      </nav>
+      <button id="helpOpen" class="help-btn" type="button" aria-haspopup="dialog"><span class="q" aria-hidden="true">?</span>使い方</button>
+    </div>
   </div>
 </header>
 
@@ -446,6 +466,74 @@ dialog::backdrop{background:var(--overlay)}
   <h2 id="dlgTitle" class="dlg-title"></h2>
   <div id="dlgBody" class="dlg-body"></div>
   <div id="dlgActions" class="row dlg-actions"></div>
+</dialog>
+
+<dialog id="helpDlg" class="help" aria-labelledby="helpTitle">
+  <div class="help-head">
+    <h2 id="helpTitle" class="dlg-title">綴の使い方</h2>
+    <button id="helpX" class="icon-btn" type="button" aria-label="閉じる">×</button>
+  </div>
+  <div class="help-body">
+    <p>綴は、毎日1ページずつ書く日記です。書いた内容は自動で保存され、字数は原稿用紙の枚数で見られます。画面上の「書く」「ふりかえる」「設定」で切り替えます。</p>
+
+    <h3>はじめて書く</h3>
+    <p>「書く」を開き、下の罫線のところに書き始めるだけです。保存ボタンはありません。書くと自動で保存され、右上あたりの表示が「保存済み」になります（<span class="k">Ctrl</span>+<span class="k">S</span> でもすぐ保存）。何を書くか迷ったら「きっかけ」を押してください。</p>
+
+    <h3>「書く」画面</h3>
+    <dl>
+      <dt>日付の ‹ ›</dt>
+      <dd>前の日・次の日のページに移ります。過去の日も書き足せます。「今日のページへ」で戻れます。</dd>
+      <dt>気分（快晴・晴れ・くもり・雨・嵐）</dt>
+      <dd>その日の気分を1つ選びます。もう一度押すと選択を外せます。「ふりかえる」のカレンダーに表示されます。</dd>
+      <dt>右上の原稿用紙</dt>
+      <dd>書いた字数と、原稿用紙の何枚ぶんかが表示されます。目標文字数を決めている場合は、あと何字かも出ます。</dd>
+      <dt>きっかけ</dt>
+      <dd>書き出しの問いが出ます。「この問いで書く」で本文に入り、「別の問い」で変えられます。「朝の型」「夜の型」「感謝の型」「整理の型」は、見出し付きのひな形を本文に入れます。</dd>
+      <dt>集中</dt>
+      <dd>ボタンなどを隠して、本文だけにします。<span class="k">Esc</span> か「集中を終える」で戻ります。</dd>
+      <dt>タイマー 5分</dt>
+      <dd>押すと5分の計測が始まり、残り時間が表示されます。もう一度押すと止まります。</dd>
+      <dt>コピー</dt>
+      <dd>いま開いているページの本文をコピーします。</dd>
+      <dt>問いを深める</dt>
+      <dd>AIがオンのときだけ表示されます。本文（一部を選択していればその部分）から問いを3つ出し、「使う」で本文の末尾に加えます。</dd>
+      <dt>ページ ＋足す</dt>
+      <dd>1日に最大10ページまで増やせます。「このページを削除」は、ページが2枚以上あるときに出ます。削除は取り消せません。</dd>
+      <dt>#タグ</dt>
+      <dd>本文に「#仕事」のように書くと、タグとして「ふりかえる」で絞り込めます。</dd>
+      <dt>前日の【明日やること】</dt>
+      <dd>「夜の型」の【明日やること】に書いておくと、翌日のページの上に表示されます。</dd>
+    </dl>
+
+    <h3>「ふりかえる」画面</h3>
+    <dl>
+      <dt>連続・記録・合計</dt>
+      <dd>連続して書いた日数、記録した日数、合計の字数が出ます。</dd>
+      <dt>カレンダー</dt>
+      <dd>書いた日に気分のマークが付きます（気分を選んでいない日は点）。‹ › で月を移り、日付を押すとその日のページが開きます。</dd>
+      <dt>過去の同じ日</dt>
+      <dd>1か月前・半年前・1年前の記録があれば表示されます。</dd>
+      <dt>直近7日のまとめ</dt>
+      <dd>AIがオンのときだけ表示されます。「まとめる」で直近7日分をまとめます（2日分以上の記録が必要）。「今日のページに追記」で本文に残せます。</dd>
+      <dt>記録</dt>
+      <dd>本文を検索できます。「#タグ」で検索するか、タグの一覧を押しても絞り込めます。押すとそのページが開きます。</dd>
+    </dl>
+
+    <h3>「設定」画面</h3>
+    <dl>
+      <dt>1日の目標文字数・文字の大きさ・罫線・配色</dt>
+      <dd>書きやすい見た目に変えられます。配色は「端末に合わせる」「明るい」「暗い」から選びます。</dd>
+      <dt>日付の切り替え時刻</dt>
+      <dd>初期値は4:00です。夜更かしして書くとき、この時刻より前なら前日のページに入ります。</dd>
+      <dt>AI（問いかけとまとめ）</dt>
+      <dd>「使わない」にすると、AIのボタンがすべて消えます。使うときも、ボタンを押したときだけ本文がClaudeに送られます。</dd>
+      <dt>書き出し・読み込み</dt>
+      <dd>Markdownは読み返しや他のアプリへの移行用、JSONはバックアップと復元用です。JSONを読み込むと、同じ日付は新しいほうが残ります。</dd>
+    </dl>
+
+    <p class="help-note">「設定」の「保存先」が「このブラウザ」のときは、ブラウザのデータを消すと記録も消えます。ときどきJSONで書き出しておくと安心です。</p>
+  </div>
+  <div class="help-foot"><button id="helpClose" class="btn btn-ink" type="button">閉じる</button></div>
 </dialog>
 
 <script>
@@ -1684,6 +1772,12 @@ function bind() {
   el.xMd.addEventListener('click', () => saveFile(`journal-${stamp()}.md`, buildMarkdown()));
   el.xJson.addEventListener('click', () => saveFile(`journal-backup-${stamp()}.json`, JSON.stringify({ app: 'tsuzuri', version: 1, exportedAt: new Date().toISOString(), entries: nonEmpty('asc').map(toDoc) }, null, 2)));
   el.iJson.addEventListener('change', onImportFile);
+
+  const help = $('helpDlg');
+  $('helpOpen').addEventListener('click', () => { help.showModal(); help.querySelector('.help-body').scrollTop = 0; });
+  $('helpClose').addEventListener('click', () => help.close());
+  $('helpX').addEventListener('click', () => help.close());
+  help.addEventListener('click', ev => { if (ev.target === help) help.close(); });
 
   document.addEventListener('keydown', ev => {
     if ((ev.ctrlKey || ev.metaKey) && (ev.key === 's' || ev.key === 'S')) { ev.preventDefault(); flushDrafts(); saver.flushNow(); }
